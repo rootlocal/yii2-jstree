@@ -1,8 +1,26 @@
 # yii2-jstree jsTree is jquery plugin for Yii2
 
+[![Latest Stable Version](https://img.shields.io/packagist/v/rootlocal/yii2-jstree.svg)](https://packagist.org/packages/rootlocal/yii2-jstree)
+
+* [Source code](https://github.com/rootlocal/yii2-jstree)
+
 ![tree1](doc/img/tree1.png "tree1")
 
-## View
+## Install
+
+```
+composer require rootlocal/yii2-jstree
+```
+
+or add
+
+~~~json
+"rootlocal/yii2-jstree" : "dev-master",
+~~~
+
+to the require section of your composer.json.
+
+### View
 
 ~~~php
 <?php
@@ -52,7 +70,7 @@ use yii\web\View;
 ]) ?>
 ~~~
 
-## TreeController
+### TreeController
 
 ~~~php
 use yii\web\Controller;
