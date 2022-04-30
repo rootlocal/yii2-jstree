@@ -1,0 +1,21 @@
+{
+  "esversion": 6,
+  "curly": true,
+  "eqeqeq": true,
+  "forin": true,
+  "noempty": true,
+  "plusplus": true,
+  "asi": false,
+  "funcscope": false,
+  "browser": true,
+  "node": true,
+  "rhino": false,
+  "couch": false,
+  "wsh": true,
+  "jquery": true,
+  "prototypejs": false,
+  "mootools": false,
+  "dojo": false,
+  "debug": true,
+  "devel": true
+}
