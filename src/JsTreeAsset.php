@@ -2,7 +2,6 @@
 
 namespace rootlocal\widgets\jstree;
 
-use rmrevin\yii\fontawesome\AssetBundle as FontAwesomeAsset;
 use yii\web\AssetBundle;
 use yii\web\JqueryAsset;
 use yii\web\YiiAsset;
@@ -22,7 +21,6 @@ class JsTreeAsset extends AssetBundle
     /** @var string[] */
     public $depends = [
         YiiAsset::class,
-        FontAwesomeAsset::class,
         JqueryAsset::class,
         JqueryHotKeysAsset::class,
         JqueryCookieAsset::class,

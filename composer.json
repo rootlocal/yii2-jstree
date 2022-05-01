@@ -10,9 +10,9 @@
   "license": "BSD-3-Clause",
   "authors": [
     {
-      "name": "Alexander Zkharov",
+      "name": "Alexander Zakharov",
       "email": "sys@eml.ru",
-      "homepage": "https://rootlocal.ru",
+      "homepage": "https://github.com/rootlocal/yii2-jstree",
       "role": "Developer"
     }
   ],
@@ -23,11 +23,7 @@
     "bower-asset/jquery.hotkeys": "dev-master",
     "bower-asset/jquery.cookie": ">=1.4",
     "bower-asset/jstree-bootstrap-theme": "~1.0.2",
-    "components/font-awesome": ">=5.0.6",
     "yiisoft/yii2-bootstrap": ">=2.0.0"
-  },
-  "suggest": {
-    "yiisoft/yii2-coding-standards": "you can use this package to check for code style issues when contributing to repository"
   },
   "autoload": {
     "psr-4": {
