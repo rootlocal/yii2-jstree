@@ -2,6 +2,7 @@
 
 namespace rootlocal\widgets\jstree;
 
+use lo\widgets\modal\ModalAjax;
 use yii\base\Widget;
 use yii\bootstrap\BootstrapAsset;
 use yii\bootstrap\Html;
@@ -20,9 +21,6 @@ use yii\web\View;
  * @property-read string $jsOptions
  * @property-read array|string[] $classMaps
  * @property-read string $hash
- *
- * @author Alexander Zakharov <sys@eml.ru>
- * @package rootlocal\widgets\jstree
  */
 class JsTreeWidget extends Widget
 {
@@ -138,6 +136,8 @@ class JsTreeWidget extends Widget
      */
     public array $options = ['class' => 'tree'];
 
+    public ?ModalAjax $modalAjax = null;
+
     /** @var string the hashed variable to store the pluginOptions */
     private string $_hash;
     /** @var string */
@@ -216,9 +216,7 @@ class JsTreeWidget extends Widget
                 break;
         }
 
-
         $this->jsOptions = ArrayHelper::merge([
-
             'core' => [
                 'data' => [
                     'url' => $this->url,
@@ -283,6 +281,8 @@ class JsTreeWidget extends Widget
     public function getJsOptions(): string
     {
         if (empty($this->_jsOptions)) {
+            $defaultJsOptions['modalAjaxId'] = $this->modalAjax !== null ? $this->modalAjax->getId() : null;
+            $defaultJsOptions['pjaxContainer'] = $this->modalAjax !== null ? $this->modalAjax->pjaxContainer : null;
             $defaultJsOptions['id'] = $this->id;
             $defaultJsOptions['actions'] = $this->actions;
             $defaultJsOptions['jstree'] = $this->jsOptions;
@@ -298,8 +298,16 @@ class JsTreeWidget extends Widget
      */
     public function run(): string
     {
+        $html = "";
         $this->initWidgetOptions();
-        return Html::tag('div', '', $this->options);
+
+        if ($this->modalAjax !== null) {
+            $html .= $this->modalAjax->run();
+        }
+
+        $html .= Html::tag('div', '', $this->options);
+
+        return $html;
     }
 
     /**

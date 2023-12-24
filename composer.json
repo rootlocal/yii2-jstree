@@ -23,7 +23,7 @@
     "bower-asset/jquery.hotkeys": "dev-master",
     "bower-asset/jquery.cookie": ">=1.4",
     "bower-asset/jstree-bootstrap-theme": "~1.0.2",
-    "yiisoft/yii2-bootstrap": ">=2.0.0"
+    "loveorigami/yii2-modal-ajax": "@dev"
   },
   "autoload": {
     "psr-4": {
