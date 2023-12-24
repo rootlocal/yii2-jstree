@@ -2,6 +2,8 @@
 
         let pluginName = 'tree',
             defaults = {
+                modalAjaxId: null,
+                pjaxContainer: null,
                 id: '',
                 jstree: {
                     plugins: ['core', 'contextmenu'],
@@ -22,8 +24,9 @@
                         label: '',
                         icon: ''
                     },
-                    select: {
-                        url: ''
+                    edit: {
+                        label: '',
+                        icon: ''
                     },
                     move: {
                         url: ''
@@ -38,6 +41,9 @@
         let selector;
         let csrfToken;
         let actions;
+        let modalAjaxId;
+        let pjaxContainer;
+        let modal;
 
         function Plugin(element, options) {
             this.element = element;
@@ -50,6 +56,9 @@
             selector = $("#" + hash);
             csrfToken = yii.getCsrfToken();
             actions = this.options.actions;
+            modalAjaxId = this.options.modalAjaxId;
+            pjaxContainer = this.options.pjaxContainer;
+            modal = $('#' + modalAjaxId);
             this.init();
         }
 
@@ -62,17 +71,17 @@
         this.InitTree = function (options) {
             let jtree = selector.jstree(options);
 
-            /*jtree.bind("changed.jstree", function (e, data){
-                console.log(data.selected[0]);
-            });*/
-
-
-            jtree.bind("copy_node.jstree", function (e, data) {
-                alert("Copied `" + data.inst.get_text(data.rslt.original) + "` inside `" + (data.rslt.parent === -1 ? 'the main container' : data.inst.get_text(data.rslt.parent)) + "` at index " + data.rslt.position);
+            jtree.on("changed.jstree", function (e, data) {
+                //console.log(data.selected[0]);
             });
 
 
-            jtree.bind('create_node.jstree', function (event, data) {
+            jtree.on("copy_node.jstree", function (e, data) {
+                //alert("Copied `" + data.inst.get_text(data.rslt.original) + "` inside `" + (data.rslt.parent === -1 ? 'the main container' : data.inst.get_text(data.rslt.parent)) + "` at index " + data.rslt.position);
+            });
+
+
+            jtree.on('create_node.jstree', function (event, data) {
                 console.log(data);
                 let xhr = new XMLHttpRequest();
                 xhr.open('PUT', actions.create.url, true);
@@ -104,7 +113,7 @@
                 };
             });
 
-            jtree.bind('rename_node.jstree', function (event, data) {
+            jtree.on('rename_node.jstree', function (event, data) {
                 console.log(event.type + ' ID: ' + data.node.id);
                 let xhr = new XMLHttpRequest();
                 xhr.open('POST', actions.rename.url, true);
@@ -133,9 +142,8 @@
                 };
             });
 
-            jtree.bind('delete_node.jstree', function (event, data) {
+            jtree.on('delete_node.jstree', function (event, data) {
                 //console.log(event.type + ' ID: ' + data.node.id);
-
                 let xhr = new XMLHttpRequest();
                 xhr.open('POST', actions.remove.url, true);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
@@ -163,7 +171,7 @@
             });
 
             if (typeof actions.move !== "undefined") {
-                jtree.bind('move_node.jstree', function (event, data) {
+                jtree.on('move_node.jstree', function (event, data) {
                     $.post(actions.move.url, {
                             id: data.node.id,
                             prev_id: $('#' + data.node.id).prev().attr('id'),
@@ -178,45 +186,53 @@
                 });
             }
 
-            if (typeof actions.select !== "undefined") {
-                jtree.bind('select_node.jstree', function (event, data) {
-                    let xhr = new XMLHttpRequest();
-                    xhr.open('POST', actions.select.url + '?id=' + data.node.id, true);
-                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-                    xhr.setRequestHeader('X-CSRF-Token', csrfToken);
-                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            jtree.on('select_node.jstree', function (event, data) {
+                event.preventDefault();
+                return data.instance.toggle_node(data.node);
+            });
 
-                    let _post_data = null;
-                    xhr.send(encodeURI(_post_data));
+            // modal edit
+            modal.on("kbModalSubmitComplete", function (xhr, textStatus) {
+                if (textStatus.status === 200 && textStatus.responseJSON.success === true) {
+                    $(this).modal('toggle');
+                    //$.pjax.reload({container: pjaxContainer, timeout: 5000});
+                    console.log(xhr);
+                }
+            });
 
-                    xhr.onreadystatechange = function () {
+            $(this).on("modal_node", function (event, node) {
+                event.preventDefault();
 
-                        if (this.readyState !== 4) {
-                            return false;
-                        }
+                if (modalAjaxId !== null) {
+                    update_url = node.original.url_update;
+                    title = node.original.text;
+                    modal.find('.modal-header span').html(title);
 
-                        if (this.status !== 200) {
-                            throw Error('Error: ' + this.status);
-                        }
+                    modal.kbModalAjax({
+                        selector: $(this),
+                        url: update_url,
+                        size: 'sm',
+                        ajaxSubmit: true,
+                        autoClose: true
+                    });
 
-                        $('#form').html(this.responseText);
-                    };
-                    //return data.instance.toggle_node(data.node);
-                });
-            }
+                    modal.modal('toggle');
+                }
 
-            jtree.bind('open_node.jstree', function (event, data) {
+            });
+
+            jtree.on('open_node.jstree', function (event, data) {
                 //data.instance.set_type(data.node,'f-open');
             });
 
-            jtree.bind('close_node.jstree', function (event, data) {
+            jtree.on('close_node.jstree', function (event, data) {
                 //data.instance.set_type(data.node,'f-closed');
             });
         };
 
         this.menu = function (node) {
             let t = selector.jstree(true);
-            let  items = {};
+            let items = {};
 
             if (typeof actions.create !== "undefined") {
                 items = $.extend({}, items, {
@@ -240,6 +256,18 @@
                         icon: actions.rename.icon,
                         action: function (obj) {
                             t.edit(node);
+                        }
+                    }
+                });
+            }
+
+            if (typeof actions.edit !== "undefined") {
+                items = $.extend({}, items, {
+                    Edit: {
+                        label: actions.edit.label,
+                        icon: actions.edit.icon,
+                        action: function (obj) {
+                            $(this).trigger("modal_node", [node]);
                         }
                     }
                 });
