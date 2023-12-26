@@ -2,8 +2,7 @@
 
         let pluginName = 'tree',
             defaults = {
-                modalAjaxId: null,
-                pjaxContainer: null,
+                modalAjaxContainer: '#modal_container',
                 id: '',
                 jstree: {
                     plugins: ['core', 'contextmenu'],
@@ -41,8 +40,6 @@
         let selector;
         let csrfToken;
         let actions;
-        let modalAjaxId;
-        let pjaxContainer;
         let modal;
 
         function Plugin(element, options) {
@@ -56,9 +53,7 @@
             selector = $("#" + hash);
             csrfToken = yii.getCsrfToken();
             actions = this.options.actions;
-            modalAjaxId = this.options.modalAjaxId;
-            pjaxContainer = this.options.pjaxContainer;
-            modal = $('#' + modalAjaxId);
+            modal = $(this.options.modalAjaxContainer);
             this.init();
         }
 
@@ -203,22 +198,19 @@
             $(this).on("modal_node", function (event, node) {
                 event.preventDefault();
 
-                if (modalAjaxId !== null) {
-                    update_url = node.original.url_update;
-                    title = node.original.text;
-                    modal.find('.modal-header span').html(title);
+                update_url = node.original.url_update;
+                title = node.original.text;
+                modal.find('.modal-header span').html(title);
 
-                    modal.kbModalAjax({
-                        selector: $(this),
-                        url: update_url,
-                        size: 'sm',
-                        ajaxSubmit: true,
-                        autoClose: true
-                    });
+                modal.kbModalAjax({
+                    selector: $(this),
+                    url: update_url,
+                    size: 'sm',
+                    ajaxSubmit: true,
+                    autoClose: true
+                });
 
-                    modal.modal('toggle');
-                }
-
+                modal.modal('toggle');
             });
 
             jtree.on('open_node.jstree', function (event, data) {
