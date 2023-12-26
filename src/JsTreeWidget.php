@@ -136,7 +136,8 @@ class JsTreeWidget extends Widget
      */
     public array $options = ['class' => 'tree'];
 
-    public ?ModalAjax $modalAjax = null;
+    /** @var string|null Jquery Container Ajax $('#ajax_container') */
+    public $modalAjaxContainer;
 
     /** @var string the hashed variable to store the pluginOptions */
     private string $_hash;
@@ -281,8 +282,7 @@ class JsTreeWidget extends Widget
     public function getJsOptions(): string
     {
         if (empty($this->_jsOptions)) {
-            $defaultJsOptions['modalAjaxId'] = $this->modalAjax !== null ? $this->modalAjax->getId() : null;
-            $defaultJsOptions['pjaxContainer'] = $this->modalAjax !== null ? $this->modalAjax->pjaxContainer : null;
+            $defaultJsOptions['modalAjaxContainer'] = $this->modalAjaxContainer;
             $defaultJsOptions['id'] = $this->id;
             $defaultJsOptions['actions'] = $this->actions;
             $defaultJsOptions['jstree'] = $this->jsOptions;
@@ -301,9 +301,9 @@ class JsTreeWidget extends Widget
         $html = "";
         $this->initWidgetOptions();
 
-        if ($this->modalAjax !== null) {
+        /*if ($this->modalAjax !== null) {
             $html .= $this->modalAjax->run();
-        }
+        }*/
 
         $html .= Html::tag('div', '', $this->options);
 
